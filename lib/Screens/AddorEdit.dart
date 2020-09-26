@@ -26,7 +26,7 @@ class _AddorEdit extends State<Add> {
           title: Text(appBarTitle),
         ),
         body: Padding(
-            padding: EdgeInsets.only(top: 15.0, right: 10.0),
+            padding: EdgeInsets.only(top: 15.0, right: 10.0,left:10.0),
             child: ListView(
               children: <Widget>[
                 ListTile(
