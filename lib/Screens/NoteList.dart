@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'AddorEdit.dart';
+
 class NoteList extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
@@ -21,6 +23,7 @@ class NoteListState extends State<NoteList>{
       floatingActionButton: FloatingActionButton(
         onPressed: (){
           debugPrint("FAB clicked");
+          navigatonextPage("Add Note");
         },
         tooltip: "Add Note",
         child: Icon(Icons.add),
@@ -49,10 +52,16 @@ class NoteListState extends State<NoteList>{
 
             onTap: (){
               debugPrint("Hey You tap me");
+              navigatonextPage("Edit Note");
             },
           )
         );
     }
   );
+  }
+  void navigatonextPage(String title){
+    Navigator.push(context,MaterialPageRoute(builder:(contex){
+      return Add();
+    }));
   }
 }

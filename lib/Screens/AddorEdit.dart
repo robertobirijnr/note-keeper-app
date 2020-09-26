@@ -1,25 +1,29 @@
 import 'package:flutter/material.dart';
 
 class Add extends StatefulWidget {
+  String appBarTitle;
+  Add(this.appBarTitle);
   @override
   State<StatefulWidget> createState() {
-    return _AddorEdit();
+    return _AddorEdit(this.appBarTitle);
     throw UnimplementedError();
   }
 }
 
 class _AddorEdit extends State<Add> {
   static var _priorites = ['High', 'Low'];
-
+  String appBarTitle;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+
+  _AddorEdit(this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.subtitle1;
     return Scaffold(
         appBar: AppBar(
-          title: Text("Add Note"),
+          title: Text(appBarTitle),
         ),
         body: Padding(
             padding: EdgeInsets.only(top: 15.0, right: 10.0),
