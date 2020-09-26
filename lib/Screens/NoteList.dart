@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'AddorEdit.dart';
 
 class NoteList extends StatefulWidget{
@@ -61,7 +60,7 @@ class NoteListState extends State<NoteList>{
   }
   void navigatonextPage(String title){
     Navigator.push(context,MaterialPageRoute(builder:(contex){
-      return Add();
+      return Add(title);
     }));
   }
 }
