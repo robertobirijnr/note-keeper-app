@@ -1,26 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'dart:async';
+import "package:note_keeper/models/Notes.dart";
+import "package:sqflite/sqflite.dart";
+import "package:note_keeper/utils/database_helpers.dart";
 
 class Add extends StatefulWidget {
-  String appBarTitle;
-  Add(this.appBarTitle);
+  final String appBarTitle;
+  final Note note;
+  Add(this.note,this.appBarTitle);
   @override
   State<StatefulWidget> createState() {
-    return _AddorEdit(this.appBarTitle);
+    return _AddorEdit(this.note,this.appBarTitle);
     throw UnimplementedError();
   }
 }
 
 class _AddorEdit extends State<Add> {
   static var _priorites = ['High', 'Low'];
+
+  DatabaseHelper helper = DatabaseHelper();
+
+  Note note;
   String appBarTitle;
+
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  _AddorEdit(this.appBarTitle);
+  _AddorEdit(this.note,this.appBarTitle);
 
   @override
   Widget build(BuildContext context) {
+
     TextStyle textStyle = Theme.of(context).textTheme.subtitle1;
+    titleController.text = note.title;
+    descriptionController.text = note.description;
+
     return Scaffold(
         appBar: AppBar(
           title: Text(appBarTitle),
@@ -38,10 +53,11 @@ class _AddorEdit extends State<Add> {
                       );
                     }).toList(),
                     style: textStyle,
-                    value: "Low",
+                    value: getPriorityAsString(note.priority),
                     onChanged: (valueSelectedByUser) {
                       setState(() {
                         debugPrint("User selected $valueSelectedByUser");
+                        updatePriorityAsInt(valueSelectedByUser);
                       });
                     },
                   ),
@@ -53,6 +69,7 @@ class _AddorEdit extends State<Add> {
                     style: textStyle,
                     onChanged: (value) {
                       debugPrint("Something changed in Title Text Field");
+                      updateTitle();
                     },
                     decoration: InputDecoration(
                         labelText: 'Title',
@@ -68,6 +85,7 @@ class _AddorEdit extends State<Add> {
                     style: textStyle,
                     onChanged: (value) {
                       debugPrint("some change in the description");
+                      updateDescription();
                     },
                     decoration: InputDecoration(
                         labelText: 'Title',
@@ -90,6 +108,7 @@ class _AddorEdit extends State<Add> {
                             ),
                             onPressed: () {
                               debugPrint("HSjhaskja");
+                              _save();
                             },
                           ),
                         ),
@@ -104,6 +123,7 @@ class _AddorEdit extends State<Add> {
                             ),
                             onPressed: () {
                               debugPrint("sdhjshdjsdh");
+                                _delete();
                             },
                           ),
                         )
@@ -112,5 +132,85 @@ class _AddorEdit extends State<Add> {
               ],
             )));
     throw UnimplementedError();
+  }
+  void moveToLastScreen(){
+    Navigator.pop(context, true);
+  }
+
+  void updatePriorityAsInt(String value){
+    switch(value){
+      case "High":
+        note.priority = 1;
+        break;
+      case "Low":
+        note.priority = 2;
+        break;
+    }
+  }
+
+  String getPriorityAsString(int value){
+    String priority;
+    switch(value){
+      case 1:
+        priority = _priorites[0];
+        break;
+      case 2:
+        priority = _priorites[1];
+        break;
+
+    }
+    return priority;
+  }
+
+  void updateTitle(){
+    note.title = titleController.text;
+  }
+  void updateDescription(){
+    note.description = descriptionController.text;
+  }
+
+  void _save() async{
+    moveToLastScreen();
+
+    int result;
+    note.date = DateFormat.yMMMd().format(DateTime.now());
+    if(note.id != null){
+      result = await helper.UpdateNote(note);
+    }else{
+      result = await helper.InsertNote(note);
+    }
+    if(result != 0){
+      _showAlertDialog("Status","Note Saved Successfully");
+    }else{
+      _showAlertDialog("Status","Problem Saving Note");
+    }
+  }
+
+  void _delete() async{
+
+    moveToLastScreen();
+
+    if(note.id == null){
+      _showAlertDialog('status', 'No Note was deleted');
+      return;
+    }
+  int result = await helper.DeleteNote(note.id);
+    if(result !=0){
+      _showAlertDialog('status', 'Note Deleted Successfully');
+    }else{
+      _showAlertDialog('status', 'Error Occured while Deleting Note');
+    }
+
+  }
+
+  void _showAlertDialog(String title, String message){
+    AlertDialog alertDialog = AlertDialog(
+      title:Text(title),
+      content:Text(message),
+    );
+    showDialog(
+      context: context,
+      builder: (_) =>alertDialog
+    );
   }
 }
